@@ -29,3 +29,6 @@ type Article struct {
 	Desc    string `json:"desc"`
 	Content string `json:"content"`
 }
+
+// global Articles array to populate in main function to simulate a database
+var Articles []Article
