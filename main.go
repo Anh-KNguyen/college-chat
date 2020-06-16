@@ -20,6 +20,10 @@ func handleRequests() {
 
 // kick off API
 func main() {
+	Articles = []Article{
+		Article{Title: "Hello", Desc: "Article Description", Content: "Article Content"},
+		Article{Title: "Hello2", Desc: "Article Description", Content: "Article Content"},
+	}
 	handleRequests()
 }
 
