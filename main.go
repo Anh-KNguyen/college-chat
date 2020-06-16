@@ -22,3 +22,10 @@ func handleRequests() {
 func main() {
 	handleRequests()
 }
+
+// Article struct for title, description, and content
+type Article struct {
+	Title   string `json:"Title"`
+	Desc    string `json:"desc"`
+	Content string `json:"content"`
+}
