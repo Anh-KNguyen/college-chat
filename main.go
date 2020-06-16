@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // handle all requests to root URL
@@ -15,17 +17,20 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 // match the URL path hit with a defined function
 func handleRequests() {
-	http.HandleFunc("/", homePage)
-	http.HandleFunc("/articles", returnAllArticles) // add articles route and map to returnAllArticles function
-	log.Fatal(http.ListenAndServe(":10000", nil))
+	// creates new instance of mux router
+	myRouter := mux.NewRouter().StrictSlash(true)
+	myRouter.HandleFunc("/", homePage)
+	myRouter.HandleFunc("/all", returnAllArticles) // add articles route and map to returnAllArticles function
+	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
 // kick off API
 func main() {
+	fmt.Println("REST API v2.0 - Mux Routers")
 	// populate Articles with dummy data
 	Articles = []Article{
-		Article{Title: "Hello", Desc: "Article Description", Content: "Article Content"},
-		Article{Title: "Hello2", Desc: "Article Description", Content: "Article Content"},
+		{Title: "Hello", Desc: "Article Description", Content: "Article Content"},
+		{Title: "Hello2", Desc: "Article Description", Content: "Article Content"},
 	}
 	handleRequests()
 }
