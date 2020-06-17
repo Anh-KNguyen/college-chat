@@ -71,8 +71,12 @@ func returnSingleArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func createNewArticle(w http.ResponseWriter, r *http.Request) {
-	// get body of POST request and return string response of request
 	fmt.Println("Endpoint Hit: createNewArticle")
+
+	// get body of POST request, unmarshal into an Article struct and append to array
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	fmt.Fprintf(w, "%+v", string(reqBody))
+	var article Article
+	json.Unmarshal(reqBody, &article)
+	Articles = append(Articles, article)
+	json.NewEncoder(w).Encode(article)
 }
