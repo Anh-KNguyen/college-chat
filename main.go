@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -19,9 +20,10 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 func handleRequests() {
 	// creates new instance of mux router
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/all", returnAllArticles) // add articles route and map to returnAllArticles function
-	myRouter.HandleFunc("/article/{id}", returnSingleArticle)
+	myRouter.HandleFunc("/", homePage).Methods("GET")
+	myRouter.HandleFunc("/articles", returnAllArticles).Methods("GET") // add articles route and map to returnAllArticles function
+	myRouter.HandleFunc("/articles", createNewArticle).Methods("POST") //this needs to be defined before the other /article endpoint (ordering)
+	myRouter.HandleFunc("/article/{id}", returnSingleArticle).Methods("GET")
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
@@ -55,6 +57,7 @@ func returnAllArticles(w http.ResponseWriter, r *http.Request) {
 
 // return single article based on {id} value from URL
 func returnSingleArticle(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Endpoint hit: returnSingleArticle")
 	vars := mux.Vars(r)
 	key := vars["id"]
 
@@ -65,4 +68,11 @@ func returnSingleArticle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func createNewArticle(w http.ResponseWriter, r *http.Request) {
+	// get body of POST request and return string response of request
+	fmt.Println("Endpoint Hit: createNewArticle")
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	fmt.Fprintf(w, "%+v", string(reqBody))
 }
