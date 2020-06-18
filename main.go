@@ -25,6 +25,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/articles", createNewArticle).Methods("POST") //needs to be defined before the other /article endpoint (ordering)
 	myRouter.HandleFunc("/article/{id}", deleteArticle).Methods("DELETE")
 	myRouter.HandleFunc("/article/{id}", returnSingleArticle).Methods("GET")
+	myRouter.HandleFunc("/article/{id}", updateArticle).Methods("PUT")
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
@@ -93,8 +94,29 @@ func deleteArticle(w http.ResponseWriter, r *http.Request) {
 	for index, article := range Articles {
 		if article.Id == id {
 			Articles = append(Articles[:index], Articles[index+1:]...)
-
 		}
 	}
+
+}
+
+func updateArticle(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Endpoint Hit: updateArticle")
+
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var article Article
+	json.Unmarshal(reqBody, &article)
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	for index, a := range Articles {
+		if a.Id == id {
+			Articles[index] = article
+			json.NewEncoder(w).Encode(article)
+			return
+		}
+	}
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("Not Found"))
 
 }
