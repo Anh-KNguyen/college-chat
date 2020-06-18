@@ -22,7 +22,8 @@ func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage).Methods("GET")
 	myRouter.HandleFunc("/articles", returnAllArticles).Methods("GET") // add articles route and map to returnAllArticles function
-	myRouter.HandleFunc("/articles", createNewArticle).Methods("POST") //this needs to be defined before the other /article endpoint (ordering)
+	myRouter.HandleFunc("/articles", createNewArticle).Methods("POST") //needs to be defined before the other /article endpoint (ordering)
+	myRouter.HandleFunc("/article/{id}", deleteArticle).Methods("DELETE")
 	myRouter.HandleFunc("/article/{id}", returnSingleArticle).Methods("GET")
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
@@ -79,4 +80,21 @@ func createNewArticle(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &article)
 	Articles = append(Articles, article)
 	json.NewEncoder(w).Encode(article)
+}
+
+func deleteArticle(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Endpoint Hit: deleteArticle")
+
+	// parse path parameters
+	vars := mux.Vars(r)
+	id := vars["id"] // extract ID of article
+
+	// search through articles, remove article if there is a match
+	for index, article := range Articles {
+		if article.Id == id {
+			Articles = append(Articles[:index], Articles[index+1:]...)
+
+		}
+	}
+
 }
