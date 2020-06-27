@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -28,7 +27,8 @@ func handleRequests() {
 	myRouter.HandleFunc("/article/{id}", returnSingleArticle).Methods("GET")
 	myRouter.HandleFunc("/article/{id}", updateArticle).Methods("PUT")
 
-	log.Fatal(http.ListenAndServe(":3000", handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(myRouter)))
+	//log.Fatal(http.ListenAndServe(":3000"), handlers.CORS(handlers.AllowedOrigins([] string{"*"})))
+	log.Fatal(http.ListenAndServe(":3000", wrapWithCORS(myRouter)))
 }
 
 // kick off API
@@ -99,6 +99,13 @@ func deleteArticle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func wrapWithCORS(nextOne http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		nextOne.ServeHTTP(w, r)
+	}
 }
 
 func updateArticle(w http.ResponseWriter, r *http.Request) {
